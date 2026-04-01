@@ -16,7 +16,9 @@ const env = {
   port: Number(getEnv("PORT", 5000)),
   nodeEnv: getEnv("NODE_ENV", "development"),
   clientUrl: getEnv("CLIENT_URL", "http://localhost:5173"),
-  mongoUri: getEnv("MONGO_URI")
+  mongoUri: getEnv("MONGO_URI"),
+  jwtSecret: getEnv("JWT_SECRET"),
+  jwtExpiresIn: getEnv("JWT_EXPIRES_IN", "7d")
 };
 
 export default env;
