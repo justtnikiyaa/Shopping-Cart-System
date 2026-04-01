@@ -1,8 +1,7 @@
+import ApiError from "../utils/ApiError.js";
+
 const notFound = (req, res, next) => {
-  res.status(404).json({
-    success: false,
-    message: `Route not found: ${req.originalUrl}`
-  });
+  next(new ApiError(`Route not found: ${req.originalUrl}`, 404));
 };
 
 export default notFound;
