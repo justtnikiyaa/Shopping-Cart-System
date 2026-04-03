@@ -12,7 +12,7 @@ import CheckoutPage from "../pages/CheckoutPage";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import NotFoundPage from "../pages/NotFoundPage";
-import ProductDetailsPage from "../pages/ProductDetailsPage";
+import ProductDetails from "../pages/ProductDetails";
 import Products from "../pages/Products";
 import Register from "../pages/Register";
 
@@ -22,7 +22,7 @@ function AppRoutes() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
-        <Route path="/products/:productId" element={<ProductDetailsPage />} />
+        <Route path="/products/:productId" element={<ProductDetails />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/cart" element={<CartPage />} />

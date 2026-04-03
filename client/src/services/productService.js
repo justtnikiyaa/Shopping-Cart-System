@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken } from "../utils/auth";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -44,6 +45,49 @@ const getProducts = async ({ search, category } = {}) => {
   }
 };
 
+const getProductById = async (productId) => {
+  try {
+    const response = await productApi.get(`/products/${productId}`);
+    return response.data?.data?.product || null;
+  } catch (error) {
+    throw new Error(mapApiError(error));
+  }
+};
+
+const addItemToCart = async ({ productId, quantity }) => {
+  try {
+    const token = getToken();
+
+    if (!token) {
+      throw new Error("Please login to add items to your cart");
+    }
+
+    const response = await productApi.post(
+      "/cart/items",
+      { productId, quantity },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const cart = response.data?.data?.cart;
+
+    if (cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+      window.dispatchEvent(new Event("storage"));
+    }
+
+    return {
+      message: response.data?.message || "Item added to cart",
+      cart
+    };
+  } catch (error) {
+    throw new Error(mapApiError(error));
+  }
+};
+
 const getCategories = async () => {
   try {
     const response = await productApi.get("/categories");
@@ -53,4 +97,4 @@ const getCategories = async () => {
   }
 };
 
-export { getCategories, getProducts };
+export { addItemToCart, getCategories, getProductById, getProducts };
