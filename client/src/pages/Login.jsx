@@ -65,7 +65,7 @@ function Login() {
       <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="text-3xl font-semibold tracking-tight text-[#1d2f6f]">
-            ShopCart
+            ShopCartt
           </Link>
           <nav className="hidden gap-8 text-sm text-slate-500 md:flex">
             <span>New Arrivals</span>
@@ -133,7 +133,7 @@ function Login() {
           </form>
 
           <p className="mt-8 text-center text-sm text-slate-500">
-            New to ShopCart?{" "}
+            New to ShopCartt?{" "}
             <Link to="/register" className="font-semibold text-[#1f3b7a] hover:underline">
               Create an account
             </Link>
@@ -144,7 +144,7 @@ function Login() {
       <footer className="border-t border-slate-200 bg-[#e9edf5]">
         <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 text-sm text-slate-500 md:grid-cols-4">
           <div>
-            <p className="text-2xl font-semibold text-[#1d2f6f]">ShopCart</p>
+            <p className="text-2xl font-semibold text-[#1d2f6f]">ShopCartt</p>
             <p className="mt-3">Crafting digital elegance for the modern connoisseur.</p>
           </div>
           <div>

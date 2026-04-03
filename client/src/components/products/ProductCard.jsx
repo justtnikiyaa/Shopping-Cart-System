@@ -30,7 +30,7 @@ function ProductCard({ product }) {
           alt={product.name}
           className="h-48 w-full object-cover transition duration-300 group-hover:scale-[1.03]"
           onError={(event) => {
-            event.currentTarget.src = "https://placehold.co/600x400/e2e8f0/475569?text=ShopCart";
+            event.currentTarget.src = "https://placehold.co/600x400/e2e8f0/475569?text=ShopCartt";
           }}
         />
         <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#1f3b7a]">

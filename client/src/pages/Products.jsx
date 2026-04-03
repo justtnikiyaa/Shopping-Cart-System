@@ -65,7 +65,7 @@ function Products() {
   return (
     <section>
       <div className="mb-8 rounded-3xl bg-gradient-to-r from-[#f8f9fd] to-[#eef3fb] p-6 sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#1f3b7a]">ShopCart Collections</p>
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#1f3b7a]">ShopCartt Collections</p>
         <h1 className="mt-2 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Product Listing</h1>
         <p className="mt-2 max-w-2xl text-sm text-slate-600 sm:text-base">
           Explore curated products, discover categories, and find what you need quickly.

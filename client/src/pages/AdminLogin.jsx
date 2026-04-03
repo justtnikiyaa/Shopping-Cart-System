@@ -71,7 +71,7 @@ function AdminLogin() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#1f3b7a] text-white shadow-md">
             ⚿
           </div>
-          <h2 className="text-4xl font-semibold tracking-tight text-[#1d2f6f]">ShopCart</h2>
+          <h2 className="text-4xl font-semibold tracking-tight text-[#1d2f6f]">ShopCartt</h2>
           <p className="mt-1 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Internal Systems</p>
         </div>
 
@@ -92,7 +92,7 @@ function AdminLogin() {
                 value={form.email}
                 onChange={handleChange}
                 className="w-full rounded-xl border border-slate-200 bg-[#f3f3f8] px-4 py-3 text-slate-900 outline-none ring-[#1f3b7a] focus:ring"
-                placeholder="admin.name@ShopCart.com"
+                placeholder="admin.name@ShopCartt.com"
               />
               {errors.email ? <p className="mt-1 text-sm text-red-600">{errors.email}</p> : null}
             </div>

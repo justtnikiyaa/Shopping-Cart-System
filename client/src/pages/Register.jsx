@@ -79,7 +79,7 @@ function Register() {
       <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="text-3xl font-semibold tracking-tight text-[#1d2f6f]">
-            ShopCart
+            ShopCartt
           </Link>
           <nav className="hidden gap-8 text-sm text-slate-500 md:flex">
             <span>New Arrivals</span>
@@ -195,7 +195,7 @@ function Register() {
       <footer className="border-t border-slate-200 bg-[#e9edf5]">
         <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 text-sm text-slate-500 md:grid-cols-4">
           <div>
-            <p className="text-2xl font-semibold text-[#1d2f6f]">ShopCart</p>
+            <p className="text-2xl font-semibold text-[#1d2f6f]">ShopCartt</p>
             <p className="mt-3">The digital destination for modern craft and intentional design.</p>
           </div>
           <div>
@@ -210,7 +210,7 @@ function Register() {
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Contact</p>
-            <p className="mt-3">hello@ShopCart.com</p>
+            <p className="mt-3">hello@ShopCartt.com</p>
           </div>
         </div>
       </footer>
