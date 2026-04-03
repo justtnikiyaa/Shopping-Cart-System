@@ -13,7 +13,7 @@ import HomePage from "../pages/HomePage";
 import Login from "../pages/Login";
 import NotFoundPage from "../pages/NotFoundPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
-import ProductsPage from "../pages/ProductsPage";
+import Products from "../pages/Products";
 import Register from "../pages/Register";
 
 function AppRoutes() {
@@ -21,7 +21,7 @@ function AppRoutes() {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products" element={<Products />} />
         <Route path="/products/:productId" element={<ProductDetailsPage />} />
 
         <Route element={<ProtectedRoute />}>
