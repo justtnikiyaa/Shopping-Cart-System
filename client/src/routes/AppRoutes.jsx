@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
-import MainLayout from "../components/layout/MainLayout";
+import MainLayout from "../layouts/MainLayout";
 import AdminCategoriesPage from "../pages/admin/AdminCategoriesPage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
