@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../services/authService";
-import { logout, saveAuthData } from "../utils/auth";
+import { useAuth } from "../context/AuthContext";
 
 function AdminLogin() {
   const navigate = useNavigate();
+  const { login, logout } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
@@ -43,7 +43,7 @@ function AdminLogin() {
     setApiError("");
 
     try {
-      const result = await loginUser({
+      const result = await login({
         email: form.email.trim(),
         password: form.password
       });
@@ -54,7 +54,6 @@ function AdminLogin() {
         return;
       }
 
-      saveAuthData({ token: result.token, user: result.user });
       navigate("/admin/dashboard", { replace: true });
     } catch (error) {
       setApiError(error.message);

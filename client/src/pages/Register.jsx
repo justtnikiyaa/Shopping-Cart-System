@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../services/authService";
-import { saveAuthData } from "../utils/auth";
+import { useAuth } from "../context/AuthContext";
 
 function Register() {
   const navigate = useNavigate();
+  const { register: registerAccount } = useAuth();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -60,13 +60,12 @@ function Register() {
     setApiError("");
 
     try {
-      const result = await registerUser({
+      await registerAccount({
         name: form.name.trim(),
         email: form.email.trim(),
         password: form.password
       });
 
-      saveAuthData({ token: result.token, user: result.user });
       navigate("/", { replace: true });
     } catch (error) {
       setApiError(error.message);

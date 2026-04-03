@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { getUser, logout } from "../../utils/auth";
+import { useAuth } from "../../context/AuthContext";
 
 const linkClassName = ({ isActive }) =>
   `rounded-md px-3 py-2 text-sm font-medium transition ${
@@ -8,7 +8,7 @@ const linkClassName = ({ isActive }) =>
 
 function Navbar() {
   const navigate = useNavigate();
-  const currentUser = getUser();
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -30,7 +30,7 @@ function Navbar() {
             Cart
           </NavLink>
 
-          {!currentUser ? (
+          {!user ? (
             <>
               <NavLink to="/login" className={linkClassName}>
                 Login

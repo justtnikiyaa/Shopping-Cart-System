@@ -1,4 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import AdminRoute from "../components/AdminRoute";
+import ProtectedRoute from "../components/ProtectedRoute";
 import MainLayout from "../components/layout/MainLayout";
 import AdminCategoriesPage from "../pages/admin/AdminCategoriesPage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
@@ -21,14 +23,18 @@ function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/products/:productId" element={<ProductDetailsPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+        </Route>
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
-        <Route path="/admin">
+        <Route path="/admin" element={<AdminRoute />}>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="login" element={<AdminLogin />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
