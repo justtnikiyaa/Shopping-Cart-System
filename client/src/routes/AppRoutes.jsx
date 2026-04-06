@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
 import MainLayout from "../layouts/MainLayout";
-import AdminCategoriesPage from "../pages/admin/AdminCategoriesPage";
+import AdminCategories from "../pages/admin/AdminCategories";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
 import AdminProductsPage from "../pages/admin/AdminProductsPage";
@@ -39,7 +39,7 @@ function AppRoutes() {
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
           <Route path="products" element={<AdminProductsPage />} />
-          <Route path="categories" element={<AdminCategoriesPage />} />
+          <Route path="categories" element={<AdminCategories />} />
           <Route path="orders" element={<AdminOrdersPage />} />
         </Route>
 
