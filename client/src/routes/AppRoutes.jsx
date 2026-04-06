@@ -3,7 +3,7 @@ import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
 import MainLayout from "../layouts/MainLayout";
 import AdminCategories from "../pages/admin/AdminCategories";
-import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
+import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminOrders from "../pages/admin/AdminOrders";
 import AdminProducts from "../pages/admin/AdminProducts";
 import AdminLogin from "../pages/AdminLogin";
@@ -37,7 +37,7 @@ function AppRoutes() {
 
         <Route path="/admin" element={<AdminRoute />}>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<AdminDashboardPage />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="orders" element={<AdminOrders />} />
