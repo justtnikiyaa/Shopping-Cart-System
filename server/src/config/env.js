@@ -26,7 +26,9 @@ const env = {
   bcryptSaltRounds: Number(getEnv("BCRYPT_SALT_ROUNDS", 10)),
   cloudinaryCloudName: getOptionalEnv("CLOUDINARY_CLOUD_NAME"),
   cloudinaryApiKey: getOptionalEnv("CLOUDINARY_API_KEY"),
-  cloudinaryApiSecret: getOptionalEnv("CLOUDINARY_API_SECRET")
+  cloudinaryApiSecret: getOptionalEnv("CLOUDINARY_API_SECRET"),
+  googleClientId: getOptionalEnv("GOOGLE_CLIENT_ID"),
+  googleClientSecret: getOptionalEnv("GOOGLE_CLIENT_SECRET")
 };
 
 export default env;

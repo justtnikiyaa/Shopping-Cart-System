@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   adminOnlySample,
   getMe,
+  googleLogin,
   login,
   register
 } from "../controllers/authController.js";
@@ -11,6 +12,7 @@ const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
+router.post("/google", googleLogin);
 router.get("/me", protect, getMe);
 router.get("/admin-only", protect, adminOnly, adminOnlySample);
 

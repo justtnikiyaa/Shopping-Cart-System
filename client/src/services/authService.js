@@ -53,4 +53,13 @@ const loginUser = async (payload) => {
   }
 };
 
-export { loginUser, registerUser };
+const googleLoginUser = async (credential) => {
+  try {
+    const response = await authApi.post("/auth/google", { credential });
+    return mapAuthResponse(response);
+  } catch (error) {
+    throw new Error(mapApiError(error));
+  }
+};
+
+export { googleLoginUser, loginUser, registerUser };

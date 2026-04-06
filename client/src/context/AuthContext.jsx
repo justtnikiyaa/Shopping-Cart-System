@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { loginUser, registerUser } from "../services/authService";
+import { googleLoginUser, loginUser, registerUser } from "../services/authService";
 import { clearAuthData, getToken, getUser, saveAuthData } from "../utils/auth";
 import { notifySuccess } from "../utils/toast";
 
@@ -32,21 +32,27 @@ function AuthProvider({ children }) {
     }
   }, []);
 
-  const login = useCallback(async (credentials) => {
-    const result = await loginUser(credentials);
+  const applySession = useCallback((result) => {
     saveAuthData({ token: result.token, user: result.user });
     setToken(result.token);
     setUser(result.user);
     return result;
   }, []);
 
+  const login = useCallback(async (credentials) => {
+    const result = await loginUser(credentials);
+    return applySession(result);
+  }, [applySession]);
+
+  const googleLogin = useCallback(async (credential) => {
+    const result = await googleLoginUser(credential);
+    return applySession(result);
+  }, [applySession]);
+
   const register = useCallback(async (payload) => {
     const result = await registerUser(payload);
-    saveAuthData({ token: result.token, user: result.user });
-    setToken(result.token);
-    setUser(result.user);
-    return result;
-  }, []);
+    return applySession(result);
+  }, [applySession]);
 
   const logout = useCallback((options = {}) => {
     const { notify = true, message = "Logged out successfully." } = options;
@@ -68,10 +74,11 @@ function AuthProvider({ children }) {
       isAuthenticated: Boolean(token && user),
       isAdminUser: user?.role === "admin",
       login,
+      googleLogin,
       register,
       logout
     }),
-    [user, token, isAuthLoading, login, register, logout]
+    [user, token, isAuthLoading, login, googleLogin, register, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

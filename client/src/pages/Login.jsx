@@ -1,3 +1,4 @@
+import { GoogleLogin } from "@react-oauth/google";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/common/LoadingSpinner";
@@ -7,11 +8,13 @@ import { notifyError, notifySuccess } from "../utils/toast";
 function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const isGoogleAuthEnabled = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
   const fromPath = location.state?.from?.pathname;
 
@@ -37,6 +40,11 @@ function Login() {
     setApiError("");
   };
 
+  const handleSuccessfulLogin = (result) => {
+    const redirectPath = result.user.role === "admin" ? "/admin/dashboard" : fromPath || "/";
+    navigate(redirectPath, { replace: true });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -54,13 +62,33 @@ function Login() {
       });
 
       notifySuccess("Login successful. Welcome back!");
-      const redirectPath = result.user.role === "admin" ? "/admin/dashboard" : fromPath || "/";
-      navigate(redirectPath, { replace: true });
+      handleSuccessfulLogin(result);
     } catch (error) {
       setApiError(error.message);
       notifyError(error.message || "Login failed.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    if (!credentialResponse?.credential) {
+      notifyError("Google login failed. Missing credential.");
+      return;
+    }
+
+    setGoogleLoading(true);
+    setApiError("");
+
+    try {
+      const result = await googleLogin(credentialResponse.credential);
+      notifySuccess("Google login successful.");
+      handleSuccessfulLogin(result);
+    } catch (error) {
+      setApiError(error.message);
+      notifyError(error.message || "Google login failed.");
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -129,7 +157,7 @@ function Login() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || googleLoading}
               className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1f3b7a] px-5 py-3 text-base font-semibold text-white shadow-md transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
@@ -142,6 +170,30 @@ function Login() {
               )}
             </button>
           </form>
+
+          <div className="mt-6">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Or continue with</p>
+            <div className="mt-3 flex justify-center">
+              {!isGoogleAuthEnabled ? (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-500">
+                  Google login unavailable. Add VITE_GOOGLE_CLIENT_ID in client .env.
+                </div>
+              ) : googleLoading ? (
+                <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
+                  <LoadingSpinner size="sm" />
+                  Processing Google login...
+                </div>
+              ) : (
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => notifyError("Google login was cancelled or failed")}
+                  shape="pill"
+                  width="280"
+                  text="continue_with"
+                />
+              )}
+            </div>
+          </div>
 
           <p className="mt-8 text-center text-sm text-slate-500">
             New to ShopCart?{" "}
@@ -185,3 +237,5 @@ function Login() {
 }
 
 export default Login;
+
+

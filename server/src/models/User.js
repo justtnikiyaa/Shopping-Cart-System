@@ -20,9 +20,8 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: [8, "Password must be at least 8 characters"],
-      select: false
+      select: false,
+      minlength: [8, "Password must be at least 8 characters"]
     },
     role: {
       type: String,
@@ -38,6 +37,11 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: []
     },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
     passkeyEnabled: {
       type: Boolean,
       default: false
@@ -48,8 +52,16 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+userSchema.pre("validate", function preValidate(next) {
+  if (this.authProvider === "local" && !this.password) {
+    this.invalidate("password", "Password is required");
+  }
+
+  next();
+});
+
 userSchema.pre("save", async function preSave(next) {
-  if (!this.isModified("password")) {
+  if (!this.isModified("password") || !this.password) {
     next();
     return;
   }
@@ -60,6 +72,10 @@ userSchema.pre("save", async function preSave(next) {
 });
 
 userSchema.methods.comparePassword = async function comparePassword(candidatePassword) {
+  if (!this.password) {
+    return false;
+  }
+
   return bcrypt.compare(candidatePassword, this.password);
 };
 
