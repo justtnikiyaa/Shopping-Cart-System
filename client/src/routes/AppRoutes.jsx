@@ -8,7 +8,7 @@ import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
 import AdminProductsPage from "../pages/admin/AdminProductsPage";
 import AdminLogin from "../pages/AdminLogin";
 import Cart from "../pages/Cart";
-import CheckoutPage from "../pages/CheckoutPage";
+import Checkout from "../pages/Checkout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import NotFoundPage from "../pages/NotFoundPage";
@@ -26,7 +26,7 @@ function AppRoutes() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/checkout" element={<Checkout />} />
         </Route>
 
         <Route path="/login" element={<Login />} />
