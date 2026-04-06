@@ -5,7 +5,7 @@ import MainLayout from "../layouts/MainLayout";
 import AdminCategories from "../pages/admin/AdminCategories";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
-import AdminProductsPage from "../pages/admin/AdminProductsPage";
+import AdminProducts from "../pages/admin/AdminProducts";
 import AdminLogin from "../pages/AdminLogin";
 import Cart from "../pages/Cart";
 import Checkout from "../pages/Checkout";
@@ -38,7 +38,7 @@ function AppRoutes() {
         <Route path="/admin" element={<AdminRoute />}>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
-          <Route path="products" element={<AdminProductsPage />} />
+          <Route path="products" element={<AdminProducts />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="orders" element={<AdminOrdersPage />} />
         </Route>

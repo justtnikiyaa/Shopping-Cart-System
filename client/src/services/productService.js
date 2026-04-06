@@ -9,6 +9,12 @@ const productApi = axios.create({
   }
 });
 
+const authConfig = (token) => ({
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+
 const mapApiError = (error) => {
   if (error.response?.data?.message) {
     return error.response.data.message;
@@ -53,6 +59,44 @@ const getProductById = async (productId) => {
   }
 };
 
+const createProductApi = async ({ token, payload }) => {
+  try {
+    const response = await productApi.post("/products", payload, authConfig(token));
+
+    return {
+      product: response.data?.data?.product || null,
+      message: response.data?.message || "Product created successfully"
+    };
+  } catch (error) {
+    throw new Error(mapApiError(error));
+  }
+};
+
+const updateProductApi = async ({ token, productId, payload }) => {
+  try {
+    const response = await productApi.put(`/products/${productId}`, payload, authConfig(token));
+
+    return {
+      product: response.data?.data?.product || null,
+      message: response.data?.message || "Product updated successfully"
+    };
+  } catch (error) {
+    throw new Error(mapApiError(error));
+  }
+};
+
+const deleteProductApi = async ({ token, productId }) => {
+  try {
+    const response = await productApi.delete(`/products/${productId}`, authConfig(token));
+
+    return {
+      message: response.data?.message || "Product deleted successfully"
+    };
+  } catch (error) {
+    throw new Error(mapApiError(error));
+  }
+};
+
 const getCategories = async () => {
   try {
     const response = await productApi.get("/categories");
@@ -62,4 +106,11 @@ const getCategories = async () => {
   }
 };
 
-export { getCategories, getProductById, getProducts };
+export {
+  createProductApi,
+  deleteProductApi,
+  getCategories,
+  getProductById,
+  getProducts,
+  updateProductApi
+};
