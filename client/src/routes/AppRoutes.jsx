@@ -7,7 +7,7 @@ import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
 import AdminProductsPage from "../pages/admin/AdminProductsPage";
 import AdminLogin from "../pages/AdminLogin";
-import CartPage from "../pages/CartPage";
+import Cart from "../pages/Cart";
 import CheckoutPage from "../pages/CheckoutPage";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
@@ -25,7 +25,7 @@ function AppRoutes() {
         <Route path="/products/:productId" element={<ProductDetails />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/cart" element={<CartPage />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<CheckoutPage />} />
         </Route>
 

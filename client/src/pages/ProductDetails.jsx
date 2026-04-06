@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { addItemToCart, getProductById } from "../services/productService";
+import { useCart } from "../context/CartContext";
+import { getProductById } from "../services/productService";
 
 const formatCurrency = (amount) =>
   new Intl.NumberFormat("en-US", {
@@ -12,6 +13,7 @@ const formatCurrency = (amount) =>
 function ProductDetails() {
   const navigate = useNavigate();
   const { productId } = useParams();
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -95,7 +97,7 @@ function ProductDetails() {
     setFeedbackMessage("");
 
     try {
-      const result = await addItemToCart({
+      const result = await addToCart({
         productId: product._id,
         quantity
       });

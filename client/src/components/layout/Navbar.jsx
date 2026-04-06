@@ -1,48 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 const navLinkClass = ({ isActive }) =>
   `rounded-md px-3 py-2 text-sm font-medium transition ${
     isActive ? "text-[#1f3b7a]" : "text-slate-600 hover:text-[#1f3b7a]"
   }`;
 
-const getStoredCartCount = () => {
-  try {
-    const raw = localStorage.getItem("cart");
-
-    if (!raw) {
-      return 0;
-    }
-
-    const parsed = JSON.parse(raw);
-
-    if (!Array.isArray(parsed?.items)) {
-      return 0;
-    }
-
-    return parsed.items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-  } catch {
-    return 0;
-  }
-};
-
 function Navbar() {
   const navigate = useNavigate();
   const { user, isAdminUser, logout } = useAuth();
+  const { totalItems } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
-
-  useEffect(() => {
-    setCartCount(getStoredCartCount());
-
-    const handleStorage = () => {
-      setCartCount(getStoredCartCount());
-    };
-
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, []);
 
   const firstName = useMemo(() => {
     if (!user?.name) {
@@ -78,7 +48,7 @@ function Navbar() {
           <NavLink to="/cart" className="relative rounded-md p-2 text-slate-600 transition hover:bg-slate-100 hover:text-[#1f3b7a]" aria-label="Cart">
             <span className="text-lg">🛒</span>
             <span className="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#1f3b7a] px-1 text-[10px] font-bold text-white">
-              {cartCount}
+              {totalItems}
             </span>
           </NavLink>
 
@@ -132,7 +102,7 @@ function Navbar() {
               Products
             </NavLink>
             <NavLink to="/cart" onClick={closeMobileMenu} className={navLinkClass}>
-              Cart ({cartCount})
+              Cart ({totalItems})
             </NavLink>
 
             {!user ? (
