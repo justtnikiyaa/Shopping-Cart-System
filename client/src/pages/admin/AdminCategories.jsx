@@ -8,6 +8,7 @@ import {
   getAllCategoriesApi,
   updateCategoryApi
 } from "../../services/categoryService";
+import { uploadImageApi, validateImageFile } from "../../services/uploadService";
 import { notifyError, notifySuccess } from "../../utils/toast";
 
 const initialForm = {
@@ -22,6 +23,8 @@ function AdminCategories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [deletingId, setDeletingId] = useState("");
   const [formValues, setFormValues] = useState(initialForm);
   const [formErrors, setFormErrors] = useState({});
@@ -48,18 +51,18 @@ function AdminCategories() {
     loadCategories();
   }, []);
 
-  const validate = () => {
+  const validate = (values = formValues) => {
     const errors = {};
 
-    if (!formValues.name.trim()) {
+    if (!values.name.trim()) {
       errors.name = "Category name is required";
     }
 
-    if (!formValues.description.trim()) {
+    if (!values.description.trim()) {
       errors.description = "Category description is required";
     }
 
-    if (!formValues.image.trim()) {
+    if (!values.image.trim()) {
       errors.image = "Category image URL is required";
     }
 
@@ -75,10 +78,66 @@ function AdminCategories() {
     setSuccessMessage("");
   };
 
+  const handleImageFileChange = (event) => {
+    const file = event.target.files?.[0] || null;
+
+    if (!file) {
+      setSelectedImageFile(null);
+      return;
+    }
+
+    try {
+      validateImageFile(file);
+      setSelectedImageFile(file);
+      setErrorMessage("");
+      setSuccessMessage("");
+    } catch (error) {
+      setSelectedImageFile(null);
+      setErrorMessage(error.message);
+      notifyError(error.message);
+    }
+  };
+
+  const handleImageUpload = async () => {
+    if (!token) {
+      const message = "Admin token not found. Please login again.";
+      setErrorMessage(message);
+      notifyError(message);
+      return null;
+    }
+
+    if (!selectedImageFile) {
+      const message = "Please choose an image file before uploading.";
+      setErrorMessage(message);
+      notifyError(message);
+      return null;
+    }
+
+    setUploadingImage(true);
+    setErrorMessage("");
+
+    try {
+      const result = await uploadImageApi({ token, file: selectedImageFile });
+
+      setFormValues((prev) => ({ ...prev, image: result.url }));
+      setFormErrors((prev) => ({ ...prev, image: "" }));
+      setSuccessMessage(result.message);
+      notifySuccess(result.message || "Image uploaded successfully.");
+      return result.url;
+    } catch (error) {
+      setErrorMessage(error.message);
+      notifyError(error.message || "Failed to upload image.");
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleResetForm = () => {
     setFormValues(initialForm);
     setFormErrors({});
     setEditingCategoryId("");
+    setSelectedImageFile(null);
   };
 
   const handleEdit = (category) => {
@@ -88,6 +147,7 @@ function AdminCategories() {
       description: category.description || "",
       image: category.image || ""
     });
+    setSelectedImageFile(null);
     setFormErrors({});
     setSuccessMessage("");
     setErrorMessage("");
@@ -136,14 +196,29 @@ function AdminCategories() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!validate()) {
-      return;
-    }
-
     if (!token) {
       const message = "Admin token not found. Please login again.";
       setErrorMessage(message);
       notifyError(message);
+      return;
+    }
+
+    let finalImageUrl = formValues.image.trim();
+
+    if (selectedImageFile) {
+      const uploadedImageUrl = await handleImageUpload();
+
+      if (!uploadedImageUrl) {
+        return;
+      }
+
+      finalImageUrl = uploadedImageUrl;
+    }
+
+    const nextValues = { ...formValues, image: finalImageUrl };
+    setFormValues(nextValues);
+
+    if (!validate(nextValues)) {
       return;
     }
 
@@ -153,9 +228,9 @@ function AdminCategories() {
 
     try {
       const payload = {
-        name: formValues.name.trim(),
-        description: formValues.description.trim(),
-        image: formValues.image.trim()
+        name: nextValues.name.trim(),
+        description: nextValues.description.trim(),
+        image: nextValues.image.trim()
       };
 
       if (editingCategoryId) {
@@ -197,7 +272,11 @@ function AdminCategories() {
           values={formValues}
           errors={formErrors}
           loading={submitting}
+          uploadingImage={uploadingImage}
+          selectedImageName={selectedImageFile?.name || ""}
           onChange={handleInputChange}
+          onImageFileChange={handleImageFileChange}
+          onImageUpload={handleImageUpload}
           onSubmit={handleSubmit}
           onCancel={handleCancelEdit}
           onReset={handleResetForm}

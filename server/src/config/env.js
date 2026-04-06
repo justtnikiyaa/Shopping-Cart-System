@@ -18,7 +18,10 @@ const env = {
   clientUrl: getEnv("CLIENT_URL", "http://localhost:5173"),
   mongoUri: getEnv("MONGO_URI"),
   jwtSecret: getEnv("JWT_SECRET"),
-  jwtExpiresIn: getEnv("JWT_EXPIRES_IN", "7d")
+  jwtExpiresIn: getEnv("JWT_EXPIRES_IN", "7d"),
+  cloudinaryCloudName: getEnv("CLOUDINARY_CLOUD_NAME"),
+  cloudinaryApiKey: getEnv("CLOUDINARY_API_KEY"),
+  cloudinaryApiSecret: getEnv("CLOUDINARY_API_SECRET")
 };
 
 export default env;

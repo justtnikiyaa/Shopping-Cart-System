@@ -9,7 +9,11 @@ function ProductForm({
   onChange,
   onSubmit,
   onCancel,
-  onReset
+  onReset,
+  onImageFileChange,
+  onImageUpload,
+  uploadingImage,
+  selectedImageName
 }) {
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -63,6 +67,50 @@ function ProductForm({
           />
           {errors.image ? <p className="mt-1 text-sm text-red-600">{errors.image}</p> : null}
         </div>
+
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <label htmlFor="productImageFile" className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+            Or Upload Image File
+          </label>
+          <input
+            id="productImageFile"
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp,image/gif,image/avif"
+            onChange={onImageFileChange}
+            className="w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-[#1f3b7a] file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
+          />
+
+          {selectedImageName ? <p className="mt-2 text-xs text-slate-600">Selected: {selectedImageName}</p> : null}
+
+          <button
+            type="button"
+            onClick={onImageUpload}
+            disabled={uploadingImage}
+            className="mt-3 inline-flex items-center justify-center gap-2 rounded-lg border border-[#1f3b7a] px-3 py-2 text-xs font-semibold text-[#1f3b7a] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {uploadingImage ? (
+              <>
+                <LoadingSpinner size="sm" />
+                Uploading...
+              </>
+            ) : (
+              "Upload Image"
+            )}
+          </button>
+        </div>
+
+        {values.image ? (
+          <div className="overflow-hidden rounded-xl border border-slate-200">
+            <img
+              src={values.image}
+              alt="Product preview"
+              className="h-36 w-full object-cover"
+              onError={(event) => {
+                event.currentTarget.src = "https://placehold.co/400x220/e2e8f0/475569?text=Image+Preview";
+              }}
+            />
+          </div>
+        ) : null}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -126,7 +174,7 @@ function ProductForm({
         <div className="flex flex-wrap gap-3 pt-2">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || uploadingImage}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f3b7a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
@@ -144,7 +192,7 @@ function ProductForm({
           <button
             type="button"
             onClick={mode === "edit" ? onCancel : onReset}
-            disabled={loading}
+            disabled={loading || uploadingImage}
             className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700"
           >
             {mode === "edit" ? "Cancel Edit" : "Reset"}

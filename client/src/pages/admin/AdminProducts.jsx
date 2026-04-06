@@ -9,6 +9,7 @@ import {
   getProducts,
   updateProductApi
 } from "../../services/productService";
+import { uploadImageApi, validateImageFile } from "../../services/uploadService";
 import { notifyError, notifySuccess } from "../../utils/toast";
 
 const initialForm = {
@@ -28,6 +29,8 @@ function AdminProducts() {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [deletingId, setDeletingId] = useState("");
   const [formValues, setFormValues] = useState(initialForm);
   const [formErrors, setFormErrors] = useState({});
@@ -83,30 +86,30 @@ function AdminProducts() {
     });
   }, [products, searchTerm]);
 
-  const validate = () => {
+  const validate = (values = formValues) => {
     const errors = {};
 
-    if (!formValues.name.trim()) {
+    if (!values.name.trim()) {
       errors.name = "Product name is required";
     }
 
-    if (!formValues.description.trim()) {
+    if (!values.description.trim()) {
       errors.description = "Product description is required";
     }
 
-    if (formValues.price === "" || Number(formValues.price) < 0) {
+    if (values.price === "" || Number(values.price) < 0) {
       errors.price = "Price must be a non-negative number";
     }
 
-    if (!formValues.image.trim()) {
+    if (!values.image.trim()) {
       errors.image = "Product image URL is required";
     }
 
-    if (!formValues.category) {
+    if (!values.category) {
       errors.category = "Category is required";
     }
 
-    if (formValues.stock === "" || Number(formValues.stock) < 0) {
+    if (values.stock === "" || Number(values.stock) < 0) {
       errors.stock = "Stock must be a non-negative number";
     }
 
@@ -122,10 +125,66 @@ function AdminProducts() {
     setSuccessMessage("");
   };
 
+  const handleImageFileChange = (event) => {
+    const file = event.target.files?.[0] || null;
+
+    if (!file) {
+      setSelectedImageFile(null);
+      return;
+    }
+
+    try {
+      validateImageFile(file);
+      setSelectedImageFile(file);
+      setErrorMessage("");
+      setSuccessMessage("");
+    } catch (error) {
+      setSelectedImageFile(null);
+      setErrorMessage(error.message);
+      notifyError(error.message);
+    }
+  };
+
+  const handleImageUpload = async () => {
+    if (!token) {
+      const message = "Admin token not found. Please login again.";
+      setErrorMessage(message);
+      notifyError(message);
+      return null;
+    }
+
+    if (!selectedImageFile) {
+      const message = "Please choose an image file before uploading.";
+      setErrorMessage(message);
+      notifyError(message);
+      return null;
+    }
+
+    setUploadingImage(true);
+    setErrorMessage("");
+
+    try {
+      const result = await uploadImageApi({ token, file: selectedImageFile });
+
+      setFormValues((prev) => ({ ...prev, image: result.url }));
+      setFormErrors((prev) => ({ ...prev, image: "" }));
+      setSuccessMessage(result.message);
+      notifySuccess(result.message || "Image uploaded successfully.");
+      return result.url;
+    } catch (error) {
+      setErrorMessage(error.message);
+      notifyError(error.message || "Failed to upload image.");
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleResetForm = () => {
     setFormValues(initialForm);
     setFormErrors({});
     setEditingProductId("");
+    setSelectedImageFile(null);
   };
 
   const handleEdit = (product) => {
@@ -138,6 +197,7 @@ function AdminProducts() {
       category: product.category?._id || "",
       stock: product.stock?.toString() || ""
     });
+    setSelectedImageFile(null);
     setFormErrors({});
     setSuccessMessage("");
     setErrorMessage("");
@@ -186,14 +246,29 @@ function AdminProducts() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!validate()) {
-      return;
-    }
-
     if (!token) {
       const message = "Admin token not found. Please login again.";
       setErrorMessage(message);
       notifyError(message);
+      return;
+    }
+
+    let finalImageUrl = formValues.image.trim();
+
+    if (selectedImageFile) {
+      const uploadedImageUrl = await handleImageUpload();
+
+      if (!uploadedImageUrl) {
+        return;
+      }
+
+      finalImageUrl = uploadedImageUrl;
+    }
+
+    const nextValues = { ...formValues, image: finalImageUrl };
+    setFormValues(nextValues);
+
+    if (!validate(nextValues)) {
       return;
     }
 
@@ -203,12 +278,12 @@ function AdminProducts() {
 
     try {
       const payload = {
-        name: formValues.name.trim(),
-        description: formValues.description.trim(),
-        price: Number(formValues.price),
-        image: formValues.image.trim(),
-        category: formValues.category,
-        stock: Number(formValues.stock)
+        name: nextValues.name.trim(),
+        description: nextValues.description.trim(),
+        price: Number(nextValues.price),
+        image: nextValues.image.trim(),
+        category: nextValues.category,
+        stock: Number(nextValues.stock)
       };
 
       if (editingProductId) {
@@ -270,7 +345,11 @@ function AdminProducts() {
           errors={formErrors}
           categories={categories}
           loading={submitting || loadingCategories}
+          uploadingImage={uploadingImage}
+          selectedImageName={selectedImageFile?.name || ""}
           onChange={handleInputChange}
+          onImageFileChange={handleImageFileChange}
+          onImageUpload={handleImageUpload}
           onSubmit={handleSubmit}
           onCancel={handleCancelEdit}
           onReset={handleResetForm}
