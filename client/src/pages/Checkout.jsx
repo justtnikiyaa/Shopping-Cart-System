@@ -5,6 +5,7 @@ import OrderSummary from "../components/checkout/OrderSummary";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { placeOrderApi } from "../services/orderService";
+import { notifyError, notifySuccess } from "../utils/toast";
 
 const initialForm = {
   fullName: "",
@@ -75,12 +76,16 @@ function Checkout() {
     }
 
     if (!items.length) {
-      setApiError("Your cart is empty. Please add items before checkout.");
+      const message = "Your cart is empty. Please add items before checkout.";
+      setApiError(message);
+      notifyError(message);
       return;
     }
 
     if (!token) {
-      setApiError("Please login to place order.");
+      const message = "Please login to place order.";
+      setApiError(message);
+      notifyError(message);
       return;
     }
 
@@ -101,13 +106,16 @@ function Checkout() {
       const result = await placeOrderApi({ token, shippingAddress });
 
       await fetchCart();
-      setSuccessMessage(result.message || "Order placed successfully");
+      const message = result.message || "Order placed successfully";
+      setSuccessMessage(message);
+      notifySuccess(message);
 
       setTimeout(() => {
-        navigate("/", { replace: true });
+        navigate("/my-orders", { replace: true });
       }, 1300);
     } catch (error) {
       setApiError(error.message);
+      notifyError(error.message || "Failed to place order.");
     } finally {
       setSubmitting(false);
     }

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
+import { notifyError, notifySuccess } from "../utils/toast";
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -49,14 +51,18 @@ function AdminLogin() {
       });
 
       if (result.user.role !== "admin") {
-        logout();
-        setApiError("Access denied: admin credentials are required");
+        logout({ notify: false });
+        const message = "Access denied: admin credentials are required";
+        setApiError(message);
+        notifyError(message);
         return;
       }
 
+      notifySuccess("Admin login successful.");
       navigate("/admin/dashboard", { replace: true });
     } catch (error) {
       setApiError(error.message);
+      notifyError(error.message || "Admin login failed.");
     } finally {
       setLoading(false);
     }
@@ -71,7 +77,7 @@ function AdminLogin() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#1f3b7a] text-white shadow-md">
             ⚿
           </div>
-          <h2 className="text-4xl font-semibold tracking-tight text-[#1d2f6f]">ShopCartt</h2>
+          <h2 className="text-4xl font-semibold tracking-tight text-[#1d2f6f]">ShopCart</h2>
           <p className="mt-1 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Internal Systems</p>
         </div>
 
@@ -92,7 +98,7 @@ function AdminLogin() {
                 value={form.email}
                 onChange={handleChange}
                 className="w-full rounded-xl border border-slate-200 bg-[#f3f3f8] px-4 py-3 text-slate-900 outline-none ring-[#1f3b7a] focus:ring"
-                placeholder="admin.name@ShopCartt.com"
+                placeholder="admin.name@shopcart.com"
               />
               {errors.email ? <p className="mt-1 text-sm text-red-600">{errors.email}</p> : null}
             </div>
@@ -124,9 +130,16 @@ function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 w-full rounded-full bg-[#1f3b7a] px-5 py-3 text-base font-semibold text-white shadow-md transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1f3b7a] px-5 py-3 text-base font-semibold text-white shadow-md transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? "Authorizing..." : "Authorize Access"}
+              {loading ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  Authorizing...
+                </>
+              ) : (
+                "Authorize Access"
+              )}
             </button>
           </form>
 

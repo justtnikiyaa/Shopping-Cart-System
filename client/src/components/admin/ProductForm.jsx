@@ -1,3 +1,5 @@
+import LoadingSpinner from "../common/LoadingSpinner";
+
 function ProductForm({
   mode,
   values,
@@ -125,9 +127,18 @@ function ProductForm({
           <button
             type="submit"
             disabled={loading}
-            className="rounded-full bg-[#1f3b7a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f3b7a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Saving..." : mode === "edit" ? "Update Product" : "Create Product"}
+            {loading ? (
+              <>
+                <LoadingSpinner size="sm" />
+                Saving...
+              </>
+            ) : mode === "edit" ? (
+              "Update Product"
+            ) : (
+              "Create Product"
+            )}
           </button>
 
           <button

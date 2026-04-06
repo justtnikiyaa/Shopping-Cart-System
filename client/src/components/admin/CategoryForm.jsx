@@ -1,3 +1,5 @@
+import LoadingSpinner from "../common/LoadingSpinner";
+
 const defaultValues = {
   name: "",
   description: "",
@@ -71,9 +73,18 @@ function CategoryForm({
           <button
             type="submit"
             disabled={loading}
-            className="rounded-full bg-[#1f3b7a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f3b7a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Saving..." : mode === "edit" ? "Update Category" : "Create Category"}
+            {loading ? (
+              <>
+                <LoadingSpinner size="sm" />
+                Saving...
+              </>
+            ) : mode === "edit" ? (
+              "Update Category"
+            ) : (
+              "Create Category"
+            )}
           </button>
 
           <button

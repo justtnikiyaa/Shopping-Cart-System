@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 import { useCart } from "../context/CartContext";
 import { getProductById } from "../services/productService";
 
@@ -97,18 +98,17 @@ function ProductDetails() {
     setFeedbackMessage("");
 
     try {
-      const result = await addToCart({
+      await addToCart({
         productId: product._id,
         quantity
       });
-
-      setFeedbackMessage(result.message || "Item added to cart successfully.");
     } catch (addError) {
-      setFeedbackMessage(addError.message);
-
       if (addError.message.toLowerCase().includes("login")) {
         navigate("/login", { state: { from: { pathname: `/products/${product._id}` } } });
+        return;
       }
+
+      setFeedbackMessage(addError.message);
     } finally {
       setAddingToCart(false);
     }
@@ -208,9 +208,7 @@ function ProductDetails() {
           </div>
 
           {feedbackMessage ? (
-            <p className={`mt-4 rounded-xl px-3 py-2 text-sm ${feedbackMessage.toLowerCase().includes("success") || feedbackMessage.toLowerCase().includes("added") ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
-              {feedbackMessage}
-            </p>
+            <p className="mt-4 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{feedbackMessage}</p>
           ) : null}
 
           <div className="mt-6 flex flex-wrap gap-3">
@@ -218,9 +216,16 @@ function ProductDetails() {
               type="button"
               onClick={handleAddToCart}
               disabled={addingToCart || outOfStock}
-              className="rounded-full bg-[#1f3b7a] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f3b7a] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {addingToCart ? "Adding..." : "Add to Cart"}
+              {addingToCart ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  Adding...
+                </>
+              ) : (
+                "Add to Cart"
+              )}
             </button>
 
             <Link

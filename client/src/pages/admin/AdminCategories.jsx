@@ -8,6 +8,7 @@ import {
   getAllCategoriesApi,
   updateCategoryApi
 } from "../../services/categoryService";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
 const initialForm = {
   name: "",
@@ -37,6 +38,7 @@ function AdminCategories() {
       setCategories(result.categories || []);
     } catch (error) {
       setErrorMessage(error.message);
+      notifyError(error.message || "Failed to load categories.");
     } finally {
       setLoading(false);
     }
@@ -97,11 +99,13 @@ function AdminCategories() {
 
   const handleDelete = async (category) => {
     if (!token) {
-      setErrorMessage("Admin token not found. Please login again.");
+      const message = "Admin token not found. Please login again.";
+      setErrorMessage(message);
+      notifyError(message);
       return;
     }
 
-    const confirmed = window.confirm(`Delete category \"${category.name}\"?`);
+    const confirmed = window.confirm(`Delete category "${category.name}"?`);
 
     if (!confirmed) {
       return;
@@ -114,6 +118,7 @@ function AdminCategories() {
     try {
       const result = await deleteCategoryApi({ token, categoryId: category._id });
       setSuccessMessage(result.message);
+      notifySuccess(result.message || "Category deleted successfully.");
 
       if (editingCategoryId === category._id) {
         handleResetForm();
@@ -122,6 +127,7 @@ function AdminCategories() {
       await loadCategories();
     } catch (error) {
       setErrorMessage(error.message);
+      notifyError(error.message || "Failed to delete category.");
     } finally {
       setDeletingId("");
     }
@@ -135,7 +141,9 @@ function AdminCategories() {
     }
 
     if (!token) {
-      setErrorMessage("Admin token not found. Please login again.");
+      const message = "Admin token not found. Please login again.";
+      setErrorMessage(message);
+      notifyError(message);
       return;
     }
 
@@ -153,15 +161,18 @@ function AdminCategories() {
       if (editingCategoryId) {
         const result = await updateCategoryApi({ token, categoryId: editingCategoryId, payload });
         setSuccessMessage(result.message);
+        notifySuccess(result.message || "Category updated successfully.");
       } else {
         const result = await createCategoryApi({ token, payload });
         setSuccessMessage(result.message);
+        notifySuccess(result.message || "Category created successfully.");
       }
 
       handleResetForm();
       await loadCategories();
     } catch (error) {
       setErrorMessage(error.message);
+      notifyError(error.message || "Failed to save category.");
     } finally {
       setSubmitting(false);
     }

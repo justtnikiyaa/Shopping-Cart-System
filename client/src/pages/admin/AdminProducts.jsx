@@ -9,6 +9,7 @@ import {
   getProducts,
   updateProductApi
 } from "../../services/productService";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
 const initialForm = {
   name: "",
@@ -43,6 +44,7 @@ function AdminProducts() {
       setProducts(result.products || []);
     } catch (error) {
       setErrorMessage(error.message);
+      notifyError(error.message || "Failed to load products.");
     } finally {
       setLoadingProducts(false);
     }
@@ -56,6 +58,7 @@ function AdminProducts() {
       setCategories(result || []);
     } catch (error) {
       setErrorMessage(error.message);
+      notifyError(error.message || "Failed to load categories.");
     } finally {
       setLoadingCategories(false);
     }
@@ -146,11 +149,13 @@ function AdminProducts() {
 
   const handleDelete = async (product) => {
     if (!token) {
-      setErrorMessage("Admin token not found. Please login again.");
+      const message = "Admin token not found. Please login again.";
+      setErrorMessage(message);
+      notifyError(message);
       return;
     }
 
-    const confirmed = window.confirm(`Delete product \"${product.name}\"?`);
+    const confirmed = window.confirm(`Delete product "${product.name}"?`);
 
     if (!confirmed) {
       return;
@@ -163,6 +168,7 @@ function AdminProducts() {
     try {
       const result = await deleteProductApi({ token, productId: product._id });
       setSuccessMessage(result.message);
+      notifySuccess(result.message || "Product deleted successfully.");
 
       if (editingProductId === product._id) {
         handleResetForm();
@@ -171,6 +177,7 @@ function AdminProducts() {
       await loadProducts();
     } catch (error) {
       setErrorMessage(error.message);
+      notifyError(error.message || "Failed to delete product.");
     } finally {
       setDeletingId("");
     }
@@ -184,7 +191,9 @@ function AdminProducts() {
     }
 
     if (!token) {
-      setErrorMessage("Admin token not found. Please login again.");
+      const message = "Admin token not found. Please login again.";
+      setErrorMessage(message);
+      notifyError(message);
       return;
     }
 
@@ -205,15 +214,18 @@ function AdminProducts() {
       if (editingProductId) {
         const result = await updateProductApi({ token, productId: editingProductId, payload });
         setSuccessMessage(result.message);
+        notifySuccess(result.message || "Product updated successfully.");
       } else {
         const result = await createProductApi({ token, payload });
         setSuccessMessage(result.message);
+        notifySuccess(result.message || "Product created successfully.");
       }
 
       handleResetForm();
       await loadProducts();
     } catch (error) {
       setErrorMessage(error.message);
+      notifyError(error.message || "Failed to save product.");
     } finally {
       setSubmitting(false);
     }

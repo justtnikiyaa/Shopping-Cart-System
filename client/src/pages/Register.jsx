@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
+import { notifyError, notifySuccess } from "../utils/toast";
 
 function Register() {
   const navigate = useNavigate();
@@ -66,9 +68,11 @@ function Register() {
         password: form.password
       });
 
+      notifySuccess("Registration successful. Welcome to ShopCart!");
       navigate("/", { replace: true });
     } catch (error) {
       setApiError(error.message);
+      notifyError(error.message || "Registration failed.");
     } finally {
       setLoading(false);
     }
@@ -79,7 +83,7 @@ function Register() {
       <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="text-3xl font-semibold tracking-tight text-[#1d2f6f]">
-            ShopCartt
+            ShopCart
           </Link>
           <nav className="hidden gap-8 text-sm text-slate-500 md:flex">
             <span>New Arrivals</span>
@@ -176,9 +180,16 @@ function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-xl bg-[#1f3b7a] px-4 py-3 text-base font-semibold text-white shadow-md transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#1f3b7a] px-4 py-3 text-base font-semibold text-white shadow-md transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? "Creating Account..." : "Create Account"}
+                {loading ? (
+                  <>
+                    <LoadingSpinner size="sm" />
+                    Creating Account...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
               </button>
             </div>
           </form>
@@ -195,7 +206,7 @@ function Register() {
       <footer className="border-t border-slate-200 bg-[#e9edf5]">
         <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 text-sm text-slate-500 md:grid-cols-4">
           <div>
-            <p className="text-2xl font-semibold text-[#1d2f6f]">ShopCartt</p>
+            <p className="text-2xl font-semibold text-[#1d2f6f]">ShopCart</p>
             <p className="mt-3">The digital destination for modern craft and intentional design.</p>
           </div>
           <div>
@@ -210,7 +221,7 @@ function Register() {
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Contact</p>
-            <p className="mt-3">hello@ShopCartt.com</p>
+            <p className="mt-3">hello@shopcart.com</p>
           </div>
         </div>
       </footer>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import OrderTable from "../../components/admin/OrderTable";
 import { useAuth } from "../../context/AuthContext";
 import { getAllOrdersApi, updateOrderStatusApi } from "../../services/orderService";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
 const allowedStatuses = ["pending", "processing", "shipped", "delivered"];
 
@@ -17,7 +18,9 @@ function AdminOrders() {
   const loadOrders = async () => {
     if (!token) {
       setLoading(false);
-      setErrorMessage("Admin token not found. Please login again.");
+      const message = "Admin token not found. Please login again.";
+      setErrorMessage(message);
+      notifyError(message);
       return;
     }
 
@@ -29,6 +32,7 @@ function AdminOrders() {
       setOrders(result.orders || []);
     } catch (error) {
       setErrorMessage(error.message);
+      notifyError(error.message || "Failed to load orders.");
     } finally {
       setLoading(false);
     }
@@ -45,12 +49,16 @@ function AdminOrders() {
 
   const handleStatusChange = async (order, nextStatus) => {
     if (!token) {
-      setErrorMessage("Admin token not found. Please login again.");
+      const message = "Admin token not found. Please login again.";
+      setErrorMessage(message);
+      notifyError(message);
       return;
     }
 
     if (!allowedStatuses.includes(nextStatus)) {
-      setErrorMessage("Invalid status selected.");
+      const message = "Invalid status selected.";
+      setErrorMessage(message);
+      notifyError(message);
       return;
     }
 
@@ -70,6 +78,7 @@ function AdminOrders() {
       });
 
       setSuccessMessage(result.message);
+      notifySuccess(result.message || "Order status updated successfully.");
 
       setOrders((prev) =>
         prev.map((item) =>
@@ -83,6 +92,7 @@ function AdminOrders() {
       );
     } catch (error) {
       setErrorMessage(error.message);
+      notifyError(error.message || "Failed to update order status.");
     } finally {
       setUpdatingOrderId("");
     }

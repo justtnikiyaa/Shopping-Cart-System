@@ -17,8 +17,6 @@ function Cart() {
     totalItems,
     isCartLoading,
     isCartMutating,
-    cartError,
-    cartMessage,
     updateQuantity,
     removeFromCart,
     clearCart,
@@ -34,7 +32,7 @@ function Cart() {
     try {
       await updateQuantity({ productId: item.product._id, quantity: item.quantity + 1 });
     } catch {
-      // Context already stores and exposes cart errors.
+      // Errors are handled in CartContext with toasts.
     }
   };
 
@@ -48,7 +46,7 @@ function Cart() {
     try {
       await updateQuantity({ productId: item.product._id, quantity: item.quantity - 1 });
     } catch {
-      // Context already stores and exposes cart errors.
+      // Errors are handled in CartContext with toasts.
     }
   };
 
@@ -58,7 +56,7 @@ function Cart() {
     try {
       await removeFromCart(item.product._id);
     } catch {
-      // Context already stores and exposes cart errors.
+      // Errors are handled in CartContext with toasts.
     }
   };
 
@@ -68,7 +66,7 @@ function Cart() {
     try {
       await clearCart();
     } catch {
-      // Context already stores and exposes cart errors.
+      // Errors are handled in CartContext with toasts.
     }
   };
 
@@ -104,14 +102,6 @@ function Cart() {
       <p className="mt-2 text-sm text-slate-600">
         Review your chosen pieces before they are meticulously prepared for delivery.
       </p>
-
-      {cartError ? (
-        <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{cartError}</p>
-      ) : null}
-
-      {cartMessage ? (
-        <p className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{cartMessage}</p>
-      ) : null}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">

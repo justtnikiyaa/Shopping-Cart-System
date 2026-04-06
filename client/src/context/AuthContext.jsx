@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { loginUser, registerUser } from "../services/authService";
 import { clearAuthData, getToken, getUser, saveAuthData } from "../utils/auth";
+import { notifySuccess } from "../utils/toast";
 
 const AuthContext = createContext(null);
 
@@ -37,10 +38,16 @@ function AuthProvider({ children }) {
     return result;
   };
 
-  const logout = () => {
+  const logout = (options = {}) => {
+    const { notify = true, message = "Logged out successfully." } = options;
+
     clearAuthData();
     setToken(null);
     setUser(null);
+
+    if (notify) {
+      notifySuccess(message);
+    }
   };
 
   const value = useMemo(

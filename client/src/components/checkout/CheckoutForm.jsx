@@ -1,3 +1,5 @@
+import LoadingSpinner from "../common/LoadingSpinner";
+
 function CheckoutForm({ values, errors, loading, onChange, onSubmit }) {
   return (
     <form onSubmit={onSubmit} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -98,9 +100,16 @@ function CheckoutForm({ values, errors, loading, onChange, onSubmit }) {
       <button
         type="submit"
         disabled={loading}
-        className="mt-6 w-full rounded-full bg-[#1f3b7a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1f3b7a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? "Placing Order..." : "Place Order"}
+        {loading ? (
+          <>
+            <LoadingSpinner size="sm" />
+            Placing Order...
+          </>
+        ) : (
+          "Place Order"
+        )}
       </button>
     </form>
   );

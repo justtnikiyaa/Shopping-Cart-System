@@ -7,6 +7,7 @@ import {
   removeCartItemApi,
   updateCartItemApi
 } from "../services/cartService";
+import { notifyError, notifySuccess } from "../utils/toast";
 
 const defaultCart = {
   items: [],
@@ -88,9 +89,11 @@ function CartProvider({ children }) {
       const { cart: updatedCart, message } = await addCartItemApi({ token, productId, quantity });
       applyCart(updatedCart);
       setCartMessage(message);
+      notifySuccess(message || "Item added to cart.");
       return { cart: updatedCart, message };
     } catch (error) {
       setCartError(error.message);
+      notifyError(error.message || "Failed to add item to cart.");
       throw error;
     } finally {
       setIsCartMutating(false);
@@ -109,9 +112,11 @@ function CartProvider({ children }) {
       const { cart: updatedCart, message } = await updateCartItemApi({ token, productId, quantity });
       applyCart(updatedCart);
       setCartMessage(message);
+      notifySuccess(message || "Cart updated successfully.");
       return { cart: updatedCart, message };
     } catch (error) {
       setCartError(error.message);
+      notifyError(error.message || "Failed to update cart.");
       throw error;
     } finally {
       setIsCartMutating(false);
@@ -130,9 +135,11 @@ function CartProvider({ children }) {
       const { cart: updatedCart, message } = await removeCartItemApi({ token, productId });
       applyCart(updatedCart);
       setCartMessage(message);
+      notifySuccess(message || "Item removed from cart.");
       return { cart: updatedCart, message };
     } catch (error) {
       setCartError(error.message);
+      notifyError(error.message || "Failed to remove item from cart.");
       throw error;
     } finally {
       setIsCartMutating(false);
@@ -151,9 +158,11 @@ function CartProvider({ children }) {
       const { cart: updatedCart, message } = await clearCartApi(token);
       applyCart(updatedCart);
       setCartMessage(message);
+      notifySuccess(message || "Cart cleared successfully.");
       return { cart: updatedCart, message };
     } catch (error) {
       setCartError(error.message);
+      notifyError(error.message || "Failed to clear cart.");
       throw error;
     } finally {
       setIsCartMutating(false);

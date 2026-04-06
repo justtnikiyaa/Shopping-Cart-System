@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
+import { notifyError, notifySuccess } from "../utils/toast";
 
 function Login() {
   const navigate = useNavigate();
@@ -51,10 +53,12 @@ function Login() {
         password: form.password
       });
 
+      notifySuccess("Login successful. Welcome back!");
       const redirectPath = result.user.role === "admin" ? "/admin/dashboard" : fromPath || "/";
       navigate(redirectPath, { replace: true });
     } catch (error) {
       setApiError(error.message);
+      notifyError(error.message || "Login failed.");
     } finally {
       setLoading(false);
     }
@@ -65,7 +69,7 @@ function Login() {
       <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="text-3xl font-semibold tracking-tight text-[#1d2f6f]">
-            ShopCartt
+            ShopCart
           </Link>
           <nav className="hidden gap-8 text-sm text-slate-500 md:flex">
             <span>New Arrivals</span>
@@ -126,14 +130,21 @@ function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 w-full rounded-full bg-[#1f3b7a] px-5 py-3 text-base font-semibold text-white shadow-md transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1f3b7a] px-5 py-3 text-base font-semibold text-white shadow-md transition hover:bg-[#182f63] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? "Signing In..." : "Sign In to Atelier"}
+              {loading ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  Signing In...
+                </>
+              ) : (
+                "Sign In to Atelier"
+              )}
             </button>
           </form>
 
           <p className="mt-8 text-center text-sm text-slate-500">
-            New to ShopCartt?{" "}
+            New to ShopCart?{" "}
             <Link to="/register" className="font-semibold text-[#1f3b7a] hover:underline">
               Create an account
             </Link>
@@ -144,7 +155,7 @@ function Login() {
       <footer className="border-t border-slate-200 bg-[#e9edf5]">
         <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 text-sm text-slate-500 md:grid-cols-4">
           <div>
-            <p className="text-2xl font-semibold text-[#1d2f6f]">ShopCartt</p>
+            <p className="text-2xl font-semibold text-[#1d2f6f]">ShopCart</p>
             <p className="mt-3">Crafting digital elegance for the modern connoisseur.</p>
           </div>
           <div>
