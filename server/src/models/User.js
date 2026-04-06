@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import env from "../config/env.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -20,13 +21,26 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters"],
+      minlength: [8, "Password must be at least 8 characters"],
       select: false
     },
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user"
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google", "github", "passkey"],
+      default: "local"
+    },
+    oauthProviders: {
+      type: [String],
+      default: []
+    },
+    passkeyEnabled: {
+      type: Boolean,
+      default: false
     }
   },
   {
@@ -40,7 +54,8 @@ userSchema.pre("save", async function preSave(next) {
     return;
   }
 
-  this.password = await bcrypt.hash(this.password, 10);
+  const rounds = Number.isInteger(env.bcryptSaltRounds) ? env.bcryptSaltRounds : 10;
+  this.password = await bcrypt.hash(this.password, rounds);
   next();
 });
 

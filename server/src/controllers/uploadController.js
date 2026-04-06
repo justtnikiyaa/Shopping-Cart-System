@@ -1,8 +1,15 @@
-import cloudinary from "../config/cloudinary.js";
+import cloudinary, { isCloudinaryConfigured } from "../config/cloudinary.js";
 import ApiError from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const uploadImage = asyncHandler(async (req, res) => {
+  if (!isCloudinaryConfigured) {
+    throw new ApiError(
+      "Cloudinary is not configured. Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
+      500
+    );
+  }
+
   if (!req.file) {
     throw new ApiError("Image file is required", 400);
   }

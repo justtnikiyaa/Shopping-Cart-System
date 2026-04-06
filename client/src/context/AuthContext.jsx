@@ -1,9 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { loginUser, registerUser } from "../services/authService";
 import { clearAuthData, getToken, getUser, saveAuthData } from "../utils/auth";
 import { notifySuccess } from "../utils/toast";
 
 const AuthContext = createContext(null);
+
+const isValidStoredUser = (value) => {
+  return Boolean(value && value.id && value.email && value.role);
+};
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -11,34 +15,40 @@ function AuthProvider({ children }) {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = getToken();
-    const storedUser = getUser();
+    try {
+      const storedToken = getToken();
+      const storedUser = getUser();
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(storedUser);
+      if (storedToken && isValidStoredUser(storedUser)) {
+        setToken(storedToken);
+        setUser(storedUser);
+      } else {
+        clearAuthData();
+      }
+    } catch {
+      clearAuthData();
+    } finally {
+      setIsAuthLoading(false);
     }
-
-    setIsAuthLoading(false);
   }, []);
 
-  const login = async (credentials) => {
+  const login = useCallback(async (credentials) => {
     const result = await loginUser(credentials);
     saveAuthData({ token: result.token, user: result.user });
     setToken(result.token);
     setUser(result.user);
     return result;
-  };
+  }, []);
 
-  const register = async (payload) => {
+  const register = useCallback(async (payload) => {
     const result = await registerUser(payload);
     saveAuthData({ token: result.token, user: result.user });
     setToken(result.token);
     setUser(result.user);
     return result;
-  };
+  }, []);
 
-  const logout = (options = {}) => {
+  const logout = useCallback((options = {}) => {
     const { notify = true, message = "Logged out successfully." } = options;
 
     clearAuthData();
@@ -48,7 +58,7 @@ function AuthProvider({ children }) {
     if (notify) {
       notifySuccess(message);
     }
-  };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -61,7 +71,7 @@ function AuthProvider({ children }) {
       register,
       logout
     }),
-    [user, token, isAuthLoading]
+    [user, token, isAuthLoading, login, register, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -27,9 +27,12 @@ const mapApiError = (error) => {
   return "Something went wrong while fetching products.";
 };
 
-const getProducts = async ({ search, category } = {}) => {
+const getProducts = async ({ search, category, page = 1, limit = 9 } = {}) => {
   try {
-    const params = {};
+    const params = {
+      page,
+      limit
+    };
 
     if (search?.trim()) {
       params.search = search.trim();
@@ -43,7 +46,15 @@ const getProducts = async ({ search, category } = {}) => {
 
     return {
       products: response.data?.data?.products || [],
-      count: response.data?.data?.count || 0
+      count: response.data?.data?.count || 0,
+      total: response.data?.data?.total || 0,
+      pagination: response.data?.data?.pagination || {
+        page,
+        limit,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false
+      }
     };
   } catch (error) {
     throw new Error(mapApiError(error));

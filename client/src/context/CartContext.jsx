@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthContext";
 import {
   addCartItemApi,
@@ -17,16 +17,36 @@ const defaultCart = {
 
 const CartContext = createContext(null);
 
+const readCachedCart = () => {
+  try {
+    const rawCart = localStorage.getItem("cart");
+
+    if (!rawCart) {
+      return defaultCart;
+    }
+
+    const parsed = JSON.parse(rawCart);
+
+    return {
+      items: Array.isArray(parsed.items) ? parsed.items : [],
+      totalItems: Number(parsed.totalItems || 0),
+      totalAmount: Number(parsed.totalAmount || 0)
+    };
+  } catch {
+    return defaultCart;
+  }
+};
+
 function CartProvider({ children }) {
   const { token, isAuthenticated, isAuthLoading } = useAuth();
 
-  const [cart, setCart] = useState(defaultCart);
+  const [cart, setCart] = useState(readCachedCart);
   const [isCartLoading, setIsCartLoading] = useState(false);
   const [isCartMutating, setIsCartMutating] = useState(false);
   const [cartError, setCartError] = useState("");
   const [cartMessage, setCartMessage] = useState("");
 
-  const applyCart = (nextCart) => {
+  const applyCart = useCallback((nextCart) => {
     const safeCart = {
       items: nextCart?.items || [],
       totalItems: Number(nextCart?.totalItems || 0),
@@ -35,16 +55,16 @@ function CartProvider({ children }) {
 
     setCart(safeCart);
     localStorage.setItem("cart", JSON.stringify(safeCart));
-  };
+  }, []);
 
-  const resetCartState = () => {
+  const resetCartState = useCallback(() => {
     setCart(defaultCart);
     setCartError("");
     setCartMessage("");
     localStorage.removeItem("cart");
-  };
+  }, []);
 
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     if (!token) {
       resetCartState();
       return;
@@ -62,7 +82,7 @@ function CartProvider({ children }) {
     } finally {
       setIsCartLoading(false);
     }
-  };
+  }, [token, resetCartState, applyCart]);
 
   useEffect(() => {
     if (isAuthLoading) {
@@ -75,9 +95,9 @@ function CartProvider({ children }) {
     }
 
     fetchCart();
-  }, [isAuthenticated, token, isAuthLoading]);
+  }, [isAuthenticated, token, isAuthLoading, fetchCart, resetCartState]);
 
-  const addToCart = async ({ productId, quantity }) => {
+  const addToCart = useCallback(async ({ productId, quantity }) => {
     if (!token) {
       throw new Error("Please login to add items to your cart");
     }
@@ -98,9 +118,9 @@ function CartProvider({ children }) {
     } finally {
       setIsCartMutating(false);
     }
-  };
+  }, [token, applyCart]);
 
-  const updateQuantity = async ({ productId, quantity }) => {
+  const updateQuantity = useCallback(async ({ productId, quantity }) => {
     if (!token) {
       throw new Error("Please login to update cart");
     }
@@ -121,9 +141,9 @@ function CartProvider({ children }) {
     } finally {
       setIsCartMutating(false);
     }
-  };
+  }, [token, applyCart]);
 
-  const removeFromCart = async (productId) => {
+  const removeFromCart = useCallback(async (productId) => {
     if (!token) {
       throw new Error("Please login to update cart");
     }
@@ -144,9 +164,9 @@ function CartProvider({ children }) {
     } finally {
       setIsCartMutating(false);
     }
-  };
+  }, [token, applyCart]);
 
-  const clearCart = async () => {
+  const clearCart = useCallback(async () => {
     if (!token) {
       throw new Error("Please login to update cart");
     }
@@ -167,12 +187,12 @@ function CartProvider({ children }) {
     } finally {
       setIsCartMutating(false);
     }
-  };
+  }, [token, applyCart]);
 
-  const clearMessages = () => {
+  const clearMessages = useCallback(() => {
     setCartError("");
     setCartMessage("");
-  };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -191,7 +211,19 @@ function CartProvider({ children }) {
       clearCart,
       clearMessages
     }),
-    [cart, isCartLoading, isCartMutating, cartError, cartMessage]
+    [
+      cart,
+      isCartLoading,
+      isCartMutating,
+      cartError,
+      cartMessage,
+      fetchCart,
+      addToCart,
+      updateQuantity,
+      removeFromCart,
+      clearCart,
+      clearMessages
+    ]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -43,7 +43,7 @@ function AdminProducts() {
     setLoadingProducts(true);
 
     try {
-      const result = await getProducts();
+      const result = await getProducts({ page: 1, limit: 200 });
       setProducts(result.products || []);
     } catch (error) {
       setErrorMessage(error.message);
@@ -380,3 +380,4 @@ function AdminProducts() {
 }
 
 export default AdminProducts;
+

@@ -30,8 +30,15 @@ function Register() {
 
     if (!form.password) {
       nextErrors.password = "Password is required";
-    } else if (form.password.length < 6) {
-      nextErrors.password = "Password must be at least 6 characters";
+    } else if (form.password.length < 8) {
+      nextErrors.password = "Password must be at least 8 characters";
+    } else {
+      const hasLetter = /[A-Za-z]/.test(form.password);
+      const hasNumber = /\d/.test(form.password);
+
+      if (!hasLetter || !hasNumber) {
+        nextErrors.password = "Password must contain at least one letter and one number";
+      }
     }
 
     if (!form.confirmPassword) {
@@ -149,7 +156,7 @@ function Register() {
                   value={form.password}
                   onChange={handleChange}
                   className="w-full rounded-xl border border-slate-200 bg-[#f3f3f8] px-4 py-3 text-slate-900 outline-none ring-[#1f3b7a] focus:ring"
-                  placeholder="Minimum 6 characters"
+                  placeholder="Minimum 8 characters, with letters and numbers"
                 />
                 {errors.password ? <p className="mt-1 text-sm text-red-600">{errors.password}</p> : null}
               </div>
@@ -230,3 +237,5 @@ function Register() {
 }
 
 export default Register;
+
+

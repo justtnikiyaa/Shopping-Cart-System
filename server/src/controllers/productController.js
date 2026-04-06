@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Category from "../models/Category.js";
 import Product from "../models/Product.js";
 import ApiError from "../utils/ApiError.js";
@@ -14,8 +15,16 @@ const normalizeProductInput = ({ name, description, price, image, category, stoc
   stock: stock === "" || stock === undefined ? undefined : Number(stock)
 });
 
+const ensureValidObjectId = (value, fieldName) => {
+  if (!mongoose.Types.ObjectId.isValid(value)) {
+    throw new ApiError(`Invalid ${fieldName}`, 400);
+  }
+};
+
 const validateCategoryExists = async (categoryId) => {
-  const exists = await Category.findById(categoryId);
+  ensureValidObjectId(categoryId, "category id");
+
+  const exists = await Category.findById(categoryId).select("_id");
 
   if (!exists) {
     throw new ApiError("Category not found", 404);
@@ -53,7 +62,9 @@ const createProduct = asyncHandler(async (req, res) => {
 
   const product = await Product.create(payload);
 
-  const populatedProduct = await Product.findById(product._id).populate("category", "name");
+  const populatedProduct = await Product.findById(product._id)
+    .populate("category", "name")
+    .lean();
 
   res.status(201).json({
     success: true,
@@ -65,10 +76,11 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 const getProducts = asyncHandler(async (req, res) => {
-  const { category, search } = req.query;
+  const { category, search, page = "1", limit = "9" } = req.query;
   const query = {};
 
   if (category) {
+    ensureValidObjectId(category, "category filter");
     query.category = category;
   }
 
@@ -76,15 +88,36 @@ const getProducts = asyncHandler(async (req, res) => {
     query.name = { $regex: escapeRegex(search), $options: "i" };
   }
 
-  const products = await Product.find(query)
-    .populate("category", "name")
-    .sort({ createdAt: -1 });
+  const parsedPage = Math.max(1, Number.parseInt(page, 10) || 1);
+  const parsedLimit = Math.min(100, Math.max(1, Number.parseInt(limit, 10) || 9));
+  const skip = (parsedPage - 1) * parsedLimit;
+
+  const [totalProducts, products] = await Promise.all([
+    Product.countDocuments(query),
+    Product.find(query)
+      .select("name description price image category stock createdAt")
+      .populate("category", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parsedLimit)
+      .lean()
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(totalProducts / parsedLimit));
 
   res.status(200).json({
     success: true,
     message: "Products fetched successfully",
     data: {
       count: products.length,
+      total: totalProducts,
+      pagination: {
+        page: parsedPage,
+        limit: parsedLimit,
+        totalPages,
+        hasNextPage: parsedPage < totalPages,
+        hasPrevPage: parsedPage > 1
+      },
       filters: {
         category: category || null,
         search: search || null
@@ -95,7 +128,11 @@ const getProducts = asyncHandler(async (req, res) => {
 });
 
 const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id).populate("category", "name");
+  ensureValidObjectId(req.params.id, "product id");
+
+  const product = await Product.findById(req.params.id)
+    .populate("category", "name")
+    .lean();
 
   if (!product) {
     throw new ApiError("Product not found", 404);
@@ -111,6 +148,8 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
+  ensureValidObjectId(req.params.id, "product id");
+
   const updates = normalizeProductInput(req.body);
 
   const hasAnyUpdate =
@@ -151,7 +190,9 @@ const updateProduct = asyncHandler(async (req, res) => {
   product.stock = updates.stock ?? product.stock;
 
   const savedProduct = await product.save();
-  const populatedProduct = await Product.findById(savedProduct._id).populate("category", "name");
+  const populatedProduct = await Product.findById(savedProduct._id)
+    .populate("category", "name")
+    .lean();
 
   res.status(200).json({
     success: true,
@@ -163,6 +204,8 @@ const updateProduct = asyncHandler(async (req, res) => {
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
+  ensureValidObjectId(req.params.id, "product id");
+
   const product = await Product.findById(req.params.id);
 
   if (!product) {
@@ -178,3 +221,4 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 export { createProduct, deleteProduct, getProductById, getProducts, updateProduct };
+

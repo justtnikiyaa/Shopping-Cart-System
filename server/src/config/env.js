@@ -12,6 +12,10 @@ const getEnv = (key, fallback) => {
   return value;
 };
 
+const getOptionalEnv = (key, fallback = "") => {
+  return process.env[key] ?? fallback;
+};
+
 const env = {
   port: Number(getEnv("PORT", 5000)),
   nodeEnv: getEnv("NODE_ENV", "development"),
@@ -19,9 +23,10 @@ const env = {
   mongoUri: getEnv("MONGO_URI"),
   jwtSecret: getEnv("JWT_SECRET"),
   jwtExpiresIn: getEnv("JWT_EXPIRES_IN", "7d"),
-  cloudinaryCloudName: getEnv("CLOUDINARY_CLOUD_NAME"),
-  cloudinaryApiKey: getEnv("CLOUDINARY_API_KEY"),
-  cloudinaryApiSecret: getEnv("CLOUDINARY_API_SECRET")
+  bcryptSaltRounds: Number(getEnv("BCRYPT_SALT_ROUNDS", 10)),
+  cloudinaryCloudName: getOptionalEnv("CLOUDINARY_CLOUD_NAME"),
+  cloudinaryApiKey: getOptionalEnv("CLOUDINARY_API_KEY"),
+  cloudinaryApiSecret: getOptionalEnv("CLOUDINARY_API_SECRET")
 };
 
 export default env;

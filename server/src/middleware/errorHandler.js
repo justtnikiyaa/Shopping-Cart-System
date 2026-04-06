@@ -5,6 +5,11 @@ const errorHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || "Internal server error";
 
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    statusCode = 400;
+    message = "Invalid JSON payload";
+  }
+
   if (err instanceof mongoose.Error.CastError) {
     statusCode = 400;
     message = `Invalid value for ${err.path}`;
@@ -28,6 +33,14 @@ const errorHandler = (err, req, res, next) => {
   if (err.code === 11000) {
     statusCode = 409;
     message = "Duplicate value detected for a unique field";
+  }
+
+  if (statusCode >= 500) {
+    console.error("[Server Error]", {
+      path: req.originalUrl,
+      method: req.method,
+      message: err.message
+    });
   }
 
   const response = {
