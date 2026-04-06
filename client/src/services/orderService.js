@@ -9,6 +9,12 @@ const orderApi = axios.create({
   }
 });
 
+const authConfig = (token) => ({
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+
 const mapApiError = (error) => {
   if (error.response?.data?.message) {
     return error.response.data.message;
@@ -26,11 +32,7 @@ const placeOrderApi = async ({ token, shippingAddress }) => {
     const response = await orderApi.post(
       "/orders/checkout",
       { shippingAddress },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
+      authConfig(token)
     );
 
     return {
@@ -44,11 +46,7 @@ const placeOrderApi = async ({ token, shippingAddress }) => {
 
 const getMyOrdersApi = async (token) => {
   try {
-    const response = await orderApi.get("/orders/my-orders", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await orderApi.get("/orders/my-orders", authConfig(token));
 
     return {
       orders: response.data?.data?.orders || [],
@@ -60,4 +58,35 @@ const getMyOrdersApi = async (token) => {
   }
 };
 
-export { getMyOrdersApi, placeOrderApi };
+const getAllOrdersApi = async (token) => {
+  try {
+    const response = await orderApi.get("/orders", authConfig(token));
+
+    return {
+      orders: response.data?.data?.orders || [],
+      count: response.data?.data?.count || 0,
+      message: response.data?.message || "Orders fetched successfully"
+    };
+  } catch (error) {
+    throw new Error(mapApiError(error));
+  }
+};
+
+const updateOrderStatusApi = async ({ token, orderId, status }) => {
+  try {
+    const response = await orderApi.patch(
+      `/orders/${orderId}/status`,
+      { status },
+      authConfig(token)
+    );
+
+    return {
+      order: response.data?.data?.order || null,
+      message: response.data?.message || "Order status updated successfully"
+    };
+  } catch (error) {
+    throw new Error(mapApiError(error));
+  }
+};
+
+export { getAllOrdersApi, getMyOrdersApi, placeOrderApi, updateOrderStatusApi };

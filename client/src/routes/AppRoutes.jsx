@@ -4,7 +4,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import MainLayout from "../layouts/MainLayout";
 import AdminCategories from "../pages/admin/AdminCategories";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
-import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
+import AdminOrders from "../pages/admin/AdminOrders";
 import AdminProducts from "../pages/admin/AdminProducts";
 import AdminLogin from "../pages/AdminLogin";
 import Cart from "../pages/Cart";
@@ -40,7 +40,7 @@ function AppRoutes() {
           <Route path="dashboard" element={<AdminDashboardPage />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="categories" element={<AdminCategories />} />
-          <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="orders" element={<AdminOrders />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
