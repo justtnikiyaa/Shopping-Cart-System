@@ -63,6 +63,10 @@ function Navbar() {
             </>
           ) : (
             <>
+              <NavLink to="/my-orders" className={navLinkClass}>
+                My Orders
+              </NavLink>
+
               <span className="px-2 text-sm font-medium text-slate-700">Hi, {firstName || "User"}</span>
 
               {isAdminUser ? (
@@ -120,6 +124,10 @@ function Navbar() {
               </>
             ) : (
               <>
+                <NavLink to="/my-orders" onClick={closeMobileMenu} className={navLinkClass}>
+                  My Orders
+                </NavLink>
+
                 <p className="px-3 py-2 text-sm font-medium text-slate-700">Signed in as {firstName || "User"}</p>
 
                 {isAdminUser ? (

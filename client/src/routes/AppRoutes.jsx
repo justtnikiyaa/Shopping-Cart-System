@@ -11,6 +11,7 @@ import Cart from "../pages/Cart";
 import Checkout from "../pages/Checkout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import MyOrders from "../pages/MyOrders";
 import NotFoundPage from "../pages/NotFoundPage";
 import ProductDetails from "../pages/ProductDetails";
 import Products from "../pages/Products";
@@ -27,6 +28,7 @@ function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/my-orders" element={<MyOrders />} />
         </Route>
 
         <Route path="/login" element={<Login />} />

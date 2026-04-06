@@ -18,7 +18,7 @@ const mapApiError = (error) => {
     return error.message;
   }
 
-  return "Something went wrong while placing order.";
+  return "Something went wrong while handling orders.";
 };
 
 const placeOrderApi = async ({ token, shippingAddress }) => {
@@ -42,4 +42,22 @@ const placeOrderApi = async ({ token, shippingAddress }) => {
   }
 };
 
-export { placeOrderApi };
+const getMyOrdersApi = async (token) => {
+  try {
+    const response = await orderApi.get("/orders/my-orders", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    return {
+      orders: response.data?.data?.orders || [],
+      count: response.data?.data?.count || 0,
+      message: response.data?.message || "Orders fetched successfully"
+    };
+  } catch (error) {
+    throw new Error(mapApiError(error));
+  }
+};
+
+export { getMyOrdersApi, placeOrderApi };
